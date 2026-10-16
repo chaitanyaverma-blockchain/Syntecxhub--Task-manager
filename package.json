@@ -11,7 +11,7 @@
     "test:server": "npm test --prefix server",
     "test:persistence": "node scripts/verify_persistence.js",
     "build:client": "npm run build --prefix client",
-    "build": "npm run build --prefix client && npm install --prefix server",
+    "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server",
     "start": "node server/server.js"
   },
   "devDependencies": {
