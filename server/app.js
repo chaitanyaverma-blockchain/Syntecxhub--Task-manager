@@ -18,17 +18,21 @@ app.use(helmet());
 
 // CORS configuration (strictly controlled origin + credentials for cookies)
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
+  process.env.CLIENT_URL,
   'http://localhost:5173',
   'http://127.0.0.1:5173',
-];
+].filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps, curl, or Postman)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        process.env.NODE_ENV === 'development' ||
+        origin.endsWith('.onrender.com')
+      ) {
         return callback(null, true);
       }
       return callback(new Error('Cross-Origin Request Blocked by CORS Policy'));
@@ -58,6 +62,21 @@ app.get('/api/health', (req, res) => {
 // Mount modular API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+
+// Serve static client assets in production if dist directory exists
+const path = require('path');
+const fs = require('fs');
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // Centralized error handling
 app.use(notFound);

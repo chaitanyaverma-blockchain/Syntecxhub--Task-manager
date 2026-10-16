@@ -8,6 +8,18 @@ const api = axios.create({
   },
 });
 
+// Request interceptor: attach Authorization header if token exists in localStorage (cross-origin fallback)
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Response interceptor for consistent error extraction
 api.interceptors.response.use(
   (response) => response,

@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         // User is not authenticated or session expired - silent clean state
+        localStorage.removeItem('token');
         setUser(null);
       } finally {
         setLoading(false);
@@ -31,6 +32,9 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
     try {
       const { data } = await api.post('/auth/signup', { name, email, password });
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       return { success: true };
     } catch (err) {
@@ -43,6 +47,9 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
     try {
       const { data } = await api.post('/auth/login', { email, password });
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       return { success: true };
     } catch (err) {
@@ -57,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err.message);
     } finally {
+      localStorage.removeItem('token');
       setUser(null);
     }
   };
