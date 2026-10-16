@@ -1,0 +1,18 @@
+{
+  "name": "task-manager-app",
+  "version": "1.0.0",
+  "description": "Full-Stack Task Manager Web Application - Syntecxhub Internship Project",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test:server": "npm test --prefix server",
+    "test:persistence": "node scripts/verify_persistence.js",
+    "build:client": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
